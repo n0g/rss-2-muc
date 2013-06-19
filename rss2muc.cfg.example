@@ -1,0 +1,5 @@
+RSS_FEEDS="--feed https://example.com/feed --feed http://example.com/comments/feed"
+XMPP_JID="bot@example.com"
+XMPP_PWD="minus3pear-regime"
+MUC_ROOM="news@conference.example.com"
+MUC_NICK="news"

@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import argparse
+import sleekxmpp
+
+# Python versions before 3.0 do not use UTF-8 encoding
+# by default. To ensure that Unicode is handled properly
+# throughout SleekXMPP, we will set the default encoding
+# ourselves to UTF-8.
+if sys.version_info < (3, 0):
+	from sleekxmpp.util.misc_ops import setdefaultencoding
+	setdefaultencoding('utf8')
+else:
+	raw_input = input
+
+
+class MUCBot(sleekxmpp.ClientXMPP):
+
+	def __init__(self, jid, password, room, nick):
+		sleekxmpp.ClientXMPP.__init__(self, jid, password)
+
+		self.room = room
+		self.nick = nick
+
+		# The session_start event will be triggered when
+		# the bot establishes its connection with the server
+		# and the XML streams are ready for use. We want to
+		# listen for this event so that we we can initialize
+		# our roster.
+		self.add_event_handler("session_start", self.start)
+
+		self.add_event_handler("rest_message",self.rest_message)
+
+	def start(self, event):
+		"""
+		Process the session_start event.
+
+		Typical actions for the session_start event are
+		requesting the roster and broadcasting an initial
+		presence stanza.
+
+		Arguments:
+			event -- An empty dictionary. The session_start
+					 event does not provide any additional
+					 data.
+		"""
+		self.get_roster()
+		self.send_presence()
+		self.plugin['xep_0045'].joinMUC(self.room,
+										self.nick,
+										# If a room password is needed, use:
+										# password=the_room_password,
+										wait=True)
+
+	def rest_message(self,msg):
+		self.send_message(mto=self.room,mbody=msg,mtype='groupchat')
+
+if __name__ == "__main__":
+	# parse options
+	parser = argparse.ArgumentParser(description='XMPP Bot which writes the standard input to a XMPP MUC')
+
+	parser.add_argument('jid', action="store",help="XMPP ID of the bot")
+	parser.add_argument('pwd', action="store",help="Password for the XMPP account of the bot")
+	parser.add_argument('room', action="store",help="Room which the bot should join")
+	parser.add_argument('nick', action="store",help="Nick that the bot should use in the MUC")
+
+	args = parser.parse_args()
+
+	# create muc bot instance
+	xmpp = MUCBot(args.jid, args.pwd, args.room, args.nick)
+	xmpp.register_plugin('xep_0030') # Service Discovery
+	xmpp.register_plugin('xep_0045') # Multi-User Chat
+	xmpp.register_plugin('xep_0199') # XMPP Ping
+
+	# connect bot
+	if xmpp.connect():
+		xmpp.process(block=False)
+	else:
+		print "Cannot connect to MUC"
+		sys.exit(1)
+
+	# read input from stdin and write it to muc
+	while True:
+		try:
+			line = sys.stdin.readline()
+		except KeyboardInterrupt:
+			sys.exit(1)
+
+		if not line:
+			break
+
+		xmpp.event("rest_message",line)

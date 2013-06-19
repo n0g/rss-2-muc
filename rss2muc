@@ -1,0 +1,3 @@
+#! /bin/sh
+source ./rss2muc.cfg
+./rss2txt $RSS_FEEDS | ./txt2muc $XMPP_JID $XMPP_PWD $MUC_ROOM $MUC_NICK
