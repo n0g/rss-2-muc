@@ -28,7 +28,7 @@ if __name__ == "__main__":
 			feed = feedparser.parse(rss)
 
 			for item in feed["items"]:
-				if item not in last_feed[rss]:
+				if item not in last_feed[rss]["items"]:
 					print item["title"] + " " + item["link"]
 			sys.stdout.flush()
 			last_feed[rss] = feed
