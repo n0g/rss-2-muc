@@ -34,6 +34,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 		self.add_event_handler("rest_message",self.rest_message)
 
+		self.ready = False
+
 	def start(self, event):
 		"""
 		Process the session_start event.
@@ -54,9 +56,13 @@ class MUCBot(sleekxmpp.ClientXMPP):
 										# If a room password is needed, use:
 										# password=the_room_password,
 										wait=True)
+		self.ready = True
 
 	def rest_message(self,msg):
 		self.send_message(mto=self.room,mbody=msg,mtype='groupchat')
+
+	def isReady(self):
+		return self.ready
 
 if __name__ == "__main__":
 	# parse options
@@ -81,6 +87,10 @@ if __name__ == "__main__":
 	else:
 		print "Cannot connect to MUC"
 		sys.exit(1)
+
+	# wait until bot becomes usable
+	while not xmpp.isReady():
+		time.sleep(1)
 
 	# read input from stdin and write it to muc
 	while True:
