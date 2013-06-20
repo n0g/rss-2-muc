@@ -5,6 +5,7 @@ import sys
 import time
 import argparse
 import sleekxmpp
+import setproctitle
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
@@ -74,6 +75,9 @@ if __name__ == "__main__":
 	parser.add_argument('nick', action="store",help="Nick that the bot should use in the MUC")
 
 	args = parser.parse_args()
+	
+	# set proctitle
+	setproctitle.setproctitle(sys.argv[0])
 
 	# create muc bot instance
 	xmpp = MUCBot(args.jid, args.pwd, args.room, args.nick)
