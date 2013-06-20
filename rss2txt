@@ -30,9 +30,9 @@ if __name__ == "__main__":
 			for item in feed["items"]:
 				if item not in last_feed[rss]:
 					print item["title"] + " " + item["link"]
+					sys.stdout.flush()
 				# only print one item if we just started
 				if not last_feed[rss]:
 					break
-			sys.stdout.flush()
 			last_feed[rss] = feed["items"]
 		time.sleep(180)
