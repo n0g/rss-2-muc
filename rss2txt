@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import os
 import sys
 import time
 import codecs
@@ -21,17 +22,15 @@ if __name__ == "__main__":
 
 
 	# initialize last update dictionary
-	last_update_pickle_filename = "." + sys.argv[0] + ".last_update"
+	last_update_pickle_filename = os.path.dirname(sys.argv[0]) + "/." + os.path.basename(sys.argv[0]) + ".last_update"
 	try:
-		last_update_pickle = open(last_update_pickle_filename,"rb")
+		last_update_pickle = open(last_update_pickle_filename,"rwb")
 		last_update = pickle.load(last_update_pickle)
 	except IOError:
+		last_update_pickle = open(last_update_pickle_filename,"w+b")
 		last_update = dict()
 		for rss in args.feeds:
 			last_update[rss] = time.gmtime()
-
-	# open pickle file to save last_update status
-	last_update_pickle = open(last_update_pickle_filename,"rwb")
 
 	while True:
 		for rss in args.feeds:
