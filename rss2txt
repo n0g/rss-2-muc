@@ -2,6 +2,7 @@
 import sys
 import time
 import codecs
+import pickle
 import argparse
 import feedparser
 
@@ -18,10 +19,19 @@ if __name__ == "__main__":
 		print "No Feeds specified. Aborting."
 		sys.exit(1)
 
+
 	# initialize last update dictionary
-	last_update = dict()
-	for rss in args.feeds:
-		last_update[rss] = time.gmtime()
+	last_update_pickle_filename = "." + sys.argv[0] + ".last_update"
+	try:
+		last_update_pickle = open(last_update_pickle_filename,"rb")
+		last_update = pickle.load(last_update_pickle)
+	except IOError:
+		last_update = dict()
+		for rss in args.feeds:
+			last_update[rss] = time.gmtime()
+
+	# open pickle file to save last_update status
+	last_update_pickle = open(last_update_pickle_filename,"rwb")
 
 	while True:
 		for rss in args.feeds:
@@ -32,4 +42,5 @@ if __name__ == "__main__":
 					print item["title"] + "... " + item["link"]
 					sys.stdout.flush()
 			last_update[rss] = feed["updated_parsed"]
+		pickle.dump(last_update,last_update_pickle)
 		time.sleep(180)
