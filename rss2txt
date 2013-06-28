@@ -18,21 +18,18 @@ if __name__ == "__main__":
 		print "No Feeds specified. Aborting."
 		sys.exit(1)
 
-	# initialize last feed dictionary
-	last_feed = dict()
+	# initialize last update dictionary
+	last_update = dict()
 	for rss in args.feeds:
-		last_feed[rss] = list()
+		last_update[rss] = time.gmtime()
 
 	while True:
 		for rss in args.feeds:
 			feed = feedparser.parse(rss)
 
 			for item in feed["items"]:
-				if item not in last_feed[rss]:
-					print item["title"] + " " + item["link"]
+				if item["published_parsed"] > last_update[rss]:
+					print item["title"] + "... " + item["link"]
 					sys.stdout.flush()
-				# only print one item if we just started
-				if not last_feed[rss]:
-					break
-			last_feed[rss] = feed["items"]
+			last_update[rss] = feed["updated_parsed"]
 		time.sleep(180)
