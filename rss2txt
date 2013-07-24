@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 
 	# read last update times from file (if it exists)
-	last_update_pickle_filename = os.path.join(os.path.dirname(sys.argv[0]),"." + os.path.basename(sys.argv[0])+".last_update")
+	last_update_pickle_filename = '%s/.%s.last_update' % (os.path.dirname(sys.argv[0]),os.path.basename(sys.argv[0]))
 	try:
 		last_update_pickle = open(last_update_pickle_filename,"rb")
 		last_update = cPickle.load(last_update_pickle)
