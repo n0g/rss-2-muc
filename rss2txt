@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 
 	# read last update times from file (if it exists)
-	last_update_pickle_filename = os.path.dirname(sys.argv[0]) + "/." + os.path.basename(sys.argv[0]) + ".last_update"
+	last_update_pickle_filename = os.path.join(os.path.dirname(sys.argv[0]),"." + os.path.basename(sys.argv[0])+".last_update")
 	try:
 		last_update_pickle = open(last_update_pickle_filename,"rb")
 		last_update = cPickle.load(last_update_pickle)
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
 			for item in feed["items"]:
 				if item["published_parsed"] > last_update[rss]:
-					print item["title"] + "... " + item["link"]
+					sys.stdout.write('%s...%s\n',item["title"],item["link"])
 					sys.stdout.flush()
 			last_update[rss] = feed["updated_parsed"]
 		cPickle.dump(last_update,last_update_pickle)
